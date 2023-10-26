@@ -1,3 +1,9 @@
+import os
+import PyPDF2
+import pyttsx3
+from flask import Flask, render_template, request, redirect, url_for, send_file
+from werkzeug.utils import secure_filename
+
 app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -33,10 +39,9 @@ def process_file(filename):
 def extract_text_from_pdf(pdf_path):
     text = ""
     with open(pdf_path, 'rb') as pdf_file:
-        pdf_reader = PyPDF2.PdfFileReader(pdf_file)
-        for page_num in range(pdf_reader.numPages):
-            page = pdf_reader.getPage(page_num)
-            text += page.extractText()
+        pdf_reader = PyPDF2.PdfReader(pdf_file)  # Change PdfFileReader to PdfReader
+        for page_num in range(len(pdf_reader.pages)):  # Change numPages to pages
+            text += pdf_reader.pages[page_num].extract_text()
     return text
 
 def convert_text_to_audio(text):
@@ -47,4 +52,4 @@ def convert_text_to_audio(text):
     return audio_file
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run()
